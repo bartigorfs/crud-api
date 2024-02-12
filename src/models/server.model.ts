@@ -11,7 +11,7 @@ export enum HTTPMethods {
     GET = 'GET',
     PUT = 'PUT',
     POST = 'POST',
-    DELETE = 'DELETE'
+    DELETE = 'DELETE',
 }
 
 export enum StatusCode {
@@ -20,9 +20,10 @@ export enum StatusCode {
     OK = 200,
     Created = 201,
     ServerError = 500,
+    NoContent= 204,
 }
 
 export interface InvalidParamsResponse {
     isValid: boolean,
-    errors?: string[]
+    errors?: string[],
 }

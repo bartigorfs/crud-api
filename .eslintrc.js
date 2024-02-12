@@ -18,6 +18,6 @@ module.exports = {
             'warn',
             { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
         ],
-        semi: ['error', 'always'],
+        '@typescript-eslint/semi': ['error', 'always'], // исправлено на '@typescript-eslint/semi'
     },
 };

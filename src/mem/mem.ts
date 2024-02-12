@@ -46,6 +46,22 @@ export const updateUser = (user: UpdateBaseUser, id: string): User | undefined =
     return mem.users.find((existing: User) => existing.id == id);
 }
 
+export const deleteUser = (userId: string) => {
+    if (!userId) throw new MemInvalidArgs();
+
+    if (!mem || !mem.users) throw new MemNotFound();
+
+    const existingUser: User | undefined = mem.users.find((exist: User) => exist.id == userId);
+
+    if (!existingUser) {
+        throw new MemNotFound();
+    }
+
+    mem.users = mem.users.filter((existing: User): boolean => existing.id !== userId);
+
+    return true;
+}
+
 export const getAllUsers = (): User[] => {
     if (mem && mem.users.length > 0) {
         return mem.users;
