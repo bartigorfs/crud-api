@@ -1,11 +1,66 @@
-import {sendNotFound} from "../../services/base-http/base-http.service";
+import {getRequestBody, sendNotFound, sendRes} from "../../services/base-http/base-http.service";
 import {IncomingMessage, ServerResponse} from "http";
+import {InvalidParamsResponse, StatusCode} from "../../models/server.model";
+import {addUser} from "../../mem/mem";
+import {BaseUser, User} from "../../models/user.model";
+import {CatchMemErrors} from "../../services/catch-mem-errors/catch-mem-errors";
 
-export const handlePostRequest = (req: IncomingMessage, res: ServerResponse<IncomingMessage> & {
+// /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
+const validateUserBody = (body: any): InvalidParamsResponse => {
+    const errors: string[] = [];
+
+    if (!body.username || typeof body.username !== 'string') {
+        errors.push('Username is missing or its not a type of number!');
+    }
+
+    if (!body.age || typeof body.age !== 'number') {
+        errors.push('Age parameter is missing or its not a type of number!');
+    }
+
+    if (!body.hobbies || !Array.isArray(body.hobbies) || !body.hobbies.every((hobby: any) => typeof hobby === 'string')) {
+        errors.push('Hobbies parameter is missing or its not a type of string array!');
+    }
+
+    return {
+        isValid: errors.length <= 0,
+        errors: errors.length > 0 ? errors : undefined
+    };
+}
+
+export const handlePostRequest = async (req: IncomingMessage, res: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
-}): void => {
-    switch (req.url) {
+}): Promise<void> => {
+    const urlParts = req.url?.split('/').filter(part => part);
+    const endpoint: string | null = urlParts && urlParts.length > 1 ? urlParts[1] : null;
+
+    switch (endpoint) {
+        case 'users': {
+            if (urlParts?.length === 2) {
+
+                const requestBody = await getRequestBody(req);
+                if (!requestBody) {
+                    return sendRes(StatusCode.BadRequest, res, {message: 'Please provide valid request body!'});
+                }
+
+                const bodyValidation: InvalidParamsResponse = validateUserBody(requestBody);
+
+                if (!bodyValidation.isValid) {
+                    return sendRes(StatusCode.BadRequest, res, {
+                        message: 'Invalid body params',
+                        errors: bodyValidation.errors
+                    });
+                }
+
+                try {
+                    const user: User = addUser(requestBody as BaseUser);
+                    return sendRes(StatusCode.Created, res, {user});
+                } catch (e: any) {
+                    return CatchMemErrors(e?.name, res, e?.message);
+                }
+            }
+            break;
+        }
         default:
-            sendNotFound(res);
+            return sendNotFound(res);
     }
 }

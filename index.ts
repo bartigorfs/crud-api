@@ -10,27 +10,22 @@ import {ServerResponse} from "http";
 
 const PORT = process.env.PORT || 4000;
 
-const server = createServer((req: IncomingMessage, res: ServerResponse) => {
+const server = createServer(async (req: IncomingMessage, res: ServerResponse) => {
     switch (req.method) {
         case HTTPMethods.GET: {
-            handleGetRequest(req, res);
-            break;
+            return handleGetRequest(req, res);
         }
         case HTTPMethods.PUT: {
-            handlePutRequest(req, res);
-            break;
+            return handlePutRequest(req, res);
         }
         case HTTPMethods.DELETE: {
-            handleDeleteRequest(req, res);
-            break;
+            return handleDeleteRequest(req, res);
         }
         case HTTPMethods.POST: {
-            handlePostRequest(req, res);
-            break;
+            return await handlePostRequest(req, res);
         }
         default: {
-            sendNotFound(res);
-            break;
+            return sendNotFound(res);
         }
     }
 });

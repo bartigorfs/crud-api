@@ -1,8 +1,11 @@
-export interface User {
-    id: string;
+export interface BaseUser {
     username: string;
     age: number;
-    hobbies: string[];
+    hobbies: (string | undefined)[];
+}
+
+export interface User extends BaseUser {
+    id: string;
 }
 
 export interface Users {

@@ -2,16 +2,12 @@ import {IncomingMessage, ServerResponse} from "http";
 import {sendNotFound, sendRes} from "../../services/base-http/base-http.service";
 import {StatusCode} from "../../models/server.model";
 import {getAllUsers, getUserById} from "../../mem/mem";
-import {User} from "../../models/user.model";
 import {CatchMemErrors} from "../../services/catch-mem-errors/catch-mem-errors";
+import {User} from "../../models/user.model";
 
 export const handleGetRequest = (req: IncomingMessage, res: ServerResponse): void => {
+
     const urlParts = req.url?.split('/').filter(part => part);
-
-    if (!urlParts || urlParts?.length < 2) {
-        sendRes(StatusCode.NotFound, res);
-    }
-
     const endpoint: string | null = urlParts && urlParts.length > 1 ? urlParts[1] : null;
 
     const getAllUsersFromMem = () => {
@@ -27,19 +23,19 @@ export const handleGetRequest = (req: IncomingMessage, res: ServerResponse): voi
     }
 
     const getUserFromMem = (userId: string) => {
-        let result: User | null = null;
+        let user: User | null = null;
 
         try {
-            result = getUserById(userId);
+            user = getUserById(userId);
 
-            if (!result) {
+            if (!user) {
                 return sendRes(StatusCode.NotFound, res);
             }
+
+            return sendRes(StatusCode.OK, res, {user});
         } catch (e: any) {
             return CatchMemErrors(e?.name, res, e?.message);
         }
-
-        return sendRes(StatusCode.OK, res, result);
     }
 
     switch (endpoint) {
@@ -53,6 +49,6 @@ export const handleGetRequest = (req: IncomingMessage, res: ServerResponse): voi
             break;
         }
         default:
-            sendNotFound(res);
+            return sendNotFound(res);
     }
 }

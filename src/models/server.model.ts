@@ -21,3 +21,8 @@ export enum StatusCode {
     Created = 201,
     ServerError = 500,
 }
+
+export interface InvalidParamsResponse {
+    isValid: boolean,
+    errors?: string[]
+}

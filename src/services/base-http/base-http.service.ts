@@ -30,6 +30,29 @@ export const sendRes = (statusCode: number | StatusCode, res: ServerResponse, da
     res.end();
 }
 
+export const getRequestBody = (req: IncomingMessage) => {
+    return new Promise((resolve, reject) => {
+        let body: string = '';
+
+        req.on('data', (chunk) => {
+            body += chunk.toString();
+        });
+
+        req.on('end', () => {
+            try {
+                const parsedBody = body ? JSON.parse(body) : undefined;
+                resolve(parsedBody);
+            } catch (error) {
+                resolve(undefined);
+            }
+        });
+
+        req.on('error', (err) => {
+            reject(err);
+        });
+    });
+}
+
 
 // export const validateParam = (param: string | number | string[] | number[]) => {
 //     if (Array.isArray(param)) {

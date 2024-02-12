@@ -1,23 +1,28 @@
-import {MemAlreadyCreated, MemInvalidArgs, MemNotFound} from "../models/mem-errors.model";
-import {User, Users} from "../models/user.model";
+import {MemInvalidArgs, MemNotFound} from "../models/mem-errors.model";
+import {BaseUser, User, Users} from "../models/user.model";
+import {v4 as uuidv4} from 'uuid';
 
-let mem: Users;
+let mem: Users = {
+    users: []
+};
 
-const addUser = (user: User): void => {
+export const addUser = (user: BaseUser): User => {
     if (!user) throw new MemInvalidArgs();
+
     if (!mem || !mem.users) throw new MemNotFound();
 
-    const searchExisting: User | undefined = mem.users.find((exist: User) => exist.id == user.id);
+    const newUser: User = {
+        ...user,
+        id: uuidv4()
+    };
 
-    if (searchExisting) {
-        throw new MemAlreadyCreated();
-    }
+    mem.users.push(newUser);
 
-    mem.users.push(user);
+    return newUser;
 }
 
-const getAllUsers = (): User[] => {
-    if (mem && mem.users) {
+export const getAllUsers = (): User[] => {
+    if (mem && mem.users.length > 0) {
         return mem.users;
     } else {
         throw new MemNotFound();
@@ -25,7 +30,7 @@ const getAllUsers = (): User[] => {
 }
 
 export const getUserById = (userId: string): User => {
-    if (mem && mem.users) {
+    if (mem && mem.users.length > 0) {
         const result: User | undefined = mem.users.find((user: User) => user.id === userId);
 
         if (!result) {
@@ -37,5 +42,3 @@ export const getUserById = (userId: string): User => {
         throw new MemNotFound();
     }
 }
-
-export {addUser, getAllUsers};
