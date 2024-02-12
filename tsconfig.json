@@ -8,8 +8,14 @@
     "target": "es2021",
     "outDir": "./dist",
     "experimentalDecorators": false,
-    "strict": true
+    "strict": true,
+    "baseUrl": "."
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "src/**/*.spec.ts"]
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "src/**/*.spec.ts"
+  ]
 }

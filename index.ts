@@ -1,10 +1,14 @@
-import {createServer} from "node:http";
+import {createServer, IncomingMessage} from "node:http";
+import {handleGetRequest} from "./src/handler/get/get.handler";
 
 const PORT = process.env.PORT || 4000;
 
-const server = createServer((req, res) => {
-    switch (req.method){
-
+const server = createServer((req: IncomingMessage, res) => {
+    switch (req.method) {
+        case 'GET': {
+            handleGetRequest(req, res);
+            break;
+        }
     }
 });
 
