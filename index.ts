@@ -7,8 +7,11 @@ import {handleDeleteRequest} from "./src/handler/delete/delete.handler";
 import {handlePostRequest} from "./src/handler/post/post.handler";
 import {sendNotFound} from "./src/services/base-http/base-http.service";
 import {ServerResponse} from "http";
+import {config} from "dotenv";
 
-const PORT = process.env.PORT || 4000;
+config();
+
+const PORT = process.env.PORT;
 
 const server = createServer(async (req: IncomingMessage, res: ServerResponse) => {
     switch (req.method) {
