@@ -1,17 +1,8 @@
-export interface MemModel {
-    users: User[];
-}
-
-export interface User {
-    id: string;
-    username: string;
-    age: number;
-    hobbies: string[];
-}
+import {StatusCode} from "./server.model";
 
 export class MemNotFound extends Error {
     constructor() {
-        super('Not found item in memory object!');
+        super('User or users not found!');
         this.name = 'MemNotFound';
     }
 }
@@ -28,4 +19,11 @@ export class MemAlreadyCreated extends Error {
         super('User already created!');
         this.name = 'MemAlreadyCreated';
     }
+}
+
+
+export enum MemErrorStatusCode {
+    'MemNotFound' = StatusCode.NotFound,
+    'MemInvalidArgs' = StatusCode.BadRequest,
+    'MemAlreadyCreated' = StatusCode.NotFound,
 }
