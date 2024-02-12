@@ -1,5 +1,6 @@
 import {IncomingMessage, ServerResponse} from "http";
-import {sendNotFound, sendRes} from "../../services/base-http/base-http.service";
+
+import {sendNotFound, sendRes, UUIDV4_REGEXP} from "../../services/base-http/base-http.service";
 import {StatusCode} from "../../models/server.model";
 import {getAllUsers, getUserById} from "../../mem/mem";
 import {CatchMemErrors} from "../../services/catch-mem-errors/catch-mem-errors";
@@ -7,7 +8,7 @@ import {User} from "../../models/user.model";
 
 export const handleGetRequest = (req: IncomingMessage, res: ServerResponse): void => {
 
-    const urlParts = req.url?.split('/').filter(part => part);
+    const urlParts: string[] | undefined = req.url?.split('/').filter(part => part);
     const endpoint: string | null = urlParts && urlParts.length > 1 ? urlParts[1] : null;
 
     const getAllUsersFromMem = () => {
@@ -19,13 +20,17 @@ export const handleGetRequest = (req: IncomingMessage, res: ServerResponse): voi
             return CatchMemErrors(e?.name, res, e?.message);
         }
 
-        sendRes(StatusCode.OK, res, result);
+        return sendRes(StatusCode.OK, res, result);
     }
 
     const getUserFromMem = (userId: string) => {
         let user: User | null = null;
 
         try {
+            if (!userId || !UUIDV4_REGEXP.test(userId)) {
+                return sendRes(StatusCode.BadRequest, res, {message: 'Bad id string'});
+            }
+
             user = getUserById(userId);
 
             if (!user) {

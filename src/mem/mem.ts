@@ -1,5 +1,5 @@
 import {MemInvalidArgs, MemNotFound} from "../models/mem-errors.model";
-import {BaseUser, User, Users} from "../models/user.model";
+import {BaseUser, UpdateBaseUser, User, Users} from "../models/user.model";
 import {v4 as uuidv4} from 'uuid';
 
 let mem: Users = {
@@ -12,13 +12,38 @@ export const addUser = (user: BaseUser): User => {
     if (!mem || !mem.users) throw new MemNotFound();
 
     const newUser: User = {
+        id: uuidv4(),
         ...user,
-        id: uuidv4()
     };
 
     mem.users.push(newUser);
 
     return newUser;
+}
+
+export const updateUser = (user: UpdateBaseUser, id: string): User | undefined => {
+    if (!user) throw new MemInvalidArgs();
+
+    if (!mem || !mem.users) throw new MemNotFound();
+
+    const existingUser: User | undefined = mem.users.find((exist: User) => exist.id == id);
+
+    if (!existingUser) {
+        throw new MemNotFound();
+    }
+
+    mem.users = mem.users.map((existing: User) => {
+        if (existing.id === id) {
+            return {
+                ...existing,
+                ...user
+            };
+        } else {
+            return existing;
+        }
+    });
+
+    return mem.users.find((existing: User) => existing.id == id);
 }
 
 export const getAllUsers = (): User[] => {

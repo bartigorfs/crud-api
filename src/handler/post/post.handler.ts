@@ -5,7 +5,6 @@ import {addUser} from "../../mem/mem";
 import {BaseUser, User} from "../../models/user.model";
 import {CatchMemErrors} from "../../services/catch-mem-errors/catch-mem-errors";
 
-// /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
 const validateUserBody = (body: any): InvalidParamsResponse => {
     const errors: string[] = [];
 
@@ -30,35 +29,32 @@ const validateUserBody = (body: any): InvalidParamsResponse => {
 export const handlePostRequest = async (req: IncomingMessage, res: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
 }): Promise<void> => {
-    const urlParts = req.url?.split('/').filter(part => part);
+    const urlParts: string[] | undefined = req.url?.split('/').filter(part => part);
     const endpoint: string | null = urlParts && urlParts.length > 1 ? urlParts[1] : null;
 
     switch (endpoint) {
         case 'users': {
-            if (urlParts?.length === 2) {
 
-                const requestBody = await getRequestBody(req);
-                if (!requestBody) {
-                    return sendRes(StatusCode.BadRequest, res, {message: 'Please provide valid request body!'});
-                }
-
-                const bodyValidation: InvalidParamsResponse = validateUserBody(requestBody);
-
-                if (!bodyValidation.isValid) {
-                    return sendRes(StatusCode.BadRequest, res, {
-                        message: 'Invalid body params',
-                        errors: bodyValidation.errors
-                    });
-                }
-
-                try {
-                    const user: User = addUser(requestBody as BaseUser);
-                    return sendRes(StatusCode.Created, res, {user});
-                } catch (e: any) {
-                    return CatchMemErrors(e?.name, res, e?.message);
-                }
+            const requestBody = await getRequestBody(req);
+            if (!requestBody) {
+                return sendRes(StatusCode.BadRequest, res, {message: 'Please provide valid request body!'});
             }
-            break;
+
+            const bodyValidation: InvalidParamsResponse = validateUserBody(requestBody);
+
+            if (!bodyValidation.isValid) {
+                return sendRes(StatusCode.BadRequest, res, {
+                    message: 'Invalid body params',
+                    errors: bodyValidation.errors
+                });
+            }
+
+            try {
+                const user: User = addUser(requestBody as BaseUser);
+                return sendRes(StatusCode.Created, res, {user});
+            } catch (e: any) {
+                return CatchMemErrors(e?.name, res, e?.message);
+            }
         }
         default:
             return sendNotFound(res);

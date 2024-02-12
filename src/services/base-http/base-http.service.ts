@@ -1,6 +1,9 @@
 import {ContentTypes, SetHeaderOptions, StatusCode} from "../../models/server.model";
 import {IncomingMessage, ServerResponse} from "http";
 
+export const UUIDV4_REGEXP: RegExp = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
+
+
 export const sendNotFound = (res: ServerResponse<IncomingMessage> & {
     req: IncomingMessage;
 }): void => {
